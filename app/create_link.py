@@ -13,8 +13,7 @@ def lambda_handler(event, context):
     body = json.loads(event['body'])
     original_url = body['url']
     short_code = ''.join(random.choices(
-        string.ascii_letters + 
-string.digits, k=6
+       string.ascii_letters +  string.digits, k=6
     ))
 
     table.put_item(Item={
@@ -25,7 +24,7 @@ string.digits, k=6
     return {
         'statusCode': 200,
         'body': json.dumps(
-            {'short_url': 
+        {'short_url':
 f"{event['requestContext']['domainName']}/{short_code}"}
         )
     }
