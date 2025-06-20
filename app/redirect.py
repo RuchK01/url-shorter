@@ -18,4 +18,3 @@ def lambda_handler(event, context):
         'statusCode': 301,
         'headers': {'Location': url}
     }
-    
