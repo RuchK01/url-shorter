@@ -4,7 +4,7 @@ FROM python:3.9-slim AS builder
 WORKDIR /app
 
 COPY app/requirements.txt .
-RUN pip install --target python -r 
+RUN pip install --target python -r \
 requirements.txt
 
 COPY app/ .
