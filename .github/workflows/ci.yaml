@@ -9,6 +9,11 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-1
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,19 +30,15 @@ jobs:
       - name: Lint and Test
         run: |
           flake8 app/
-          pytest || true # Use '|| true' to allow the workflow to continue if tests fail temporarily, remove later for strictness.
+          pytest || true
 
       - name: Build Lambda Zips with Docker
         run: |
           docker build -t lambda-builder .
-          # Create the /build directory on the host (GitHub Actions runner) if it doesn't exist
           mkdir -p build
-          # Create a temporary container from the built image
           docker create --name temp_lambda_builder lambda-builder
-          # Copy the zipped artifacts from inside the temporary container to the host's build directory
           docker cp temp_lambda_builder:/build/create_link.zip ./build/create_link.zip
           docker cp temp_lambda_builder:/build/redirect.zip ./build/redirect.zip
-          # Remove the temporary container
           docker rm temp_lambda_builder
 
       - name: Set up Terraform
@@ -46,7 +47,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Terraform Init
-        run: terraform -chdir=terraform init -backend-config="bucket=url-shortener-tf-state-bucket" -backend-config="dynamodb_table=terraform-locks" -backend-config="region=us-east-1" # Replace with your S3 bucket name and correct region.
+        run: terraform -chdir=terraform init -backend-config="bucket=url-shortener-tf-state-bucket" -backend-config="dynamodb_table=terraform-locks" -backend-config="region=us-east-1"
 
       - name: Terraform Plan
         run: terraform -chdir=terraform plan
@@ -54,10 +55,3 @@ jobs:
       - name: Terraform Apply (main branch only)
         if: github.ref == 'refs/heads/main'
         run: terraform -chdir=terraform apply -auto-approve
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: us-east-1 # Ensure this matches your AWS region
-
-# Added this comment to trigger a new workflow run and confirm all changes are picked up.
