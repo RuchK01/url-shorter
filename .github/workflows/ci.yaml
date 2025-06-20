@@ -54,6 +54,8 @@ jobs:
           ls -la
           echo "terraform folder:"
           ls -la terraform
+      - name: Verify aws creditinals
+        run: aws sts get-caller-identity
        
       - name: Terraform Init
         run: terraform init
