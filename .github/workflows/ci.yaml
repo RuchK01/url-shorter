@@ -50,7 +50,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform -chdir=terraform plan
+        run: terraform plan
 
       - name: Terraform Apply (main branch only)
         if: github.ref == 'refs/heads/main'
