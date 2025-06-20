@@ -30,7 +30,15 @@ jobs:
       - name: Build Lambda Zips with Docker
         run: |
           docker build -t lambda-builder .
-          docker run --rm -v ${{ github.workspace }}/build:/build lambda-builder
+          # Create the /build directory on the host (GitHub Actions runner) if it doesn't exist
+          mkdir -p build
+          # Create a temporary container from the built image
+          docker create --name temp_lambda_builder lambda-builder
+          # Copy the zipped artifacts from inside the temporary container to the host's build directory
+          docker cp temp_lambda_builder:/build/create_link.zip ./build/create_link.zip
+          docker cp temp_lambda_builder:/build/redirect.zip ./build/redirect.zip
+          # Remove the temporary container
+          docker rm temp_lambda_builder
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -51,3 +59,5 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: us-east-1 # Ensure this matches your AWS region
+
+# Added this comment to trigger a new workflow run and confirm all changes are picked up.
