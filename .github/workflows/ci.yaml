@@ -57,10 +57,13 @@ jobs:
        
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan
+        working-directory: terraform
 
       - name: Terraform Apply (main branch only)
         if: github.ref == 'refs/heads/main'
         run: terraform -chdir=terraform apply -auto-approve
+        working-directory: terraform
