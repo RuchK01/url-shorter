@@ -47,7 +47,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Terraform Init
-        run: terraform -chdir=terraform init -backend-config="bucket=url-shortener-tf-state-bucket" -backend-config="dynamodb_table=terraform-locks" -backend-config="region=us-east-1"
+        run: terraform init
 
       - name: Terraform Plan
         run: terraform -chdir=terraform plan
