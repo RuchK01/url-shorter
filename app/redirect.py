@@ -13,9 +13,9 @@ def lambda_handler(event, context):
     response = table.get_item(Key={'code': code})
     if 'Item' not in response:
         return {'statusCode': 404, 'body': 'Not found'}
-
     url = response['Item']['url']
     return {
         'statusCode': 301,
         'headers': {'Location': url}
     }
+    
