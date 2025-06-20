@@ -61,6 +61,16 @@ jobs:
         run: terraform init
         working-directory: terraform
 
+      - name: Import API Gateway Create Route
+        run: terraform import 'aws_apigatewayv2_route.create_route' '1gars9yeya/wi9a7zk'
+        working-directory: terraform
+        continue-on-error: true
+
+      - name: Import API Gateway Redirect Route
+        run: terraform import 'aws_apigatewayv2_route.redirect_route' '1gars9yeya/f0bzfo9'
+        working-directory: terraform
+        continue-on-error: true
+
       - name: Terraform Plan
         run: terraform plan
         working-directory: terraform
