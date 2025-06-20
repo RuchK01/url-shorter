@@ -9,7 +9,7 @@ requirements.txt
 
 COPY app/ .
 
-RUN zip -r /build/create_link.zip create_link.py 
+RUN zip -r /build/create_link.zip create_link.py \
 python/
-RUN zip -r /build/redirect.zip redirect.py 
+RUN zip -r /build/redirect.zip redirect.py \
 python/
