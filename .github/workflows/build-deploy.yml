@@ -36,28 +36,50 @@
           - name: Run Flake8 Lint Check
             run: |
               flake8 app/ # Run flake8 on the app directory
-              
-          - name: Package Lambda Functions
+
+                    - name: Package Lambda Functions
             run: |
-              # Create a build directory for deployment packages
+              # Create a 'build' directory at the root for the final zip files
               mkdir -p build
 
-              # Package create_link Lambda
-              pip install --target ./package create_link.py # Install create_link.py into package dir
-              cp app/create_link.py package/
-              cd package
+              # --- Package create_link Lambda ---
+              # Create a temporary 'package' directory for its contents (dependencies + handler)
+              mkdir -p package_create_link_temp
+
+              # Install dependencies from app/requirements.txt into the temporary directory
+              pip install -r app/requirements.txt --target package_create_link_temp
+
+              # Copy the Lambda handler file into the temporary directory
+              cp app/create_link.py package_create_link_temp/
+
+              # Navigate into the temporary directory, zip its contents, then move the zip to 'build'
+              cd package_create_link_temp
               zip -r ../build/create_link.zip .
               cd ..
-              rm -rf package # Clean up package directory
 
-              # Package redirect Lambda
-              mkdir -p package # Recreate package directory for redirect
-              pip install --target ./package redirect.py # Install redirect.py into package dir
-              cp app/redirect.py package/
-              cd package
+              # Clean up the temporary directory
+              rm -rf package_create_link_temp
+
+              # --- Package redirect Lambda ---
+              # Create a temporary 'package' directory for its contents (dependencies + handler)
+              mkdir -p package_redirect_temp
+
+              # Install dependencies from app/requirements.txt into the temporary directory
+              pip install -r app/requirements.txt --target package_redirect_temp
+
+              # Copy the Lambda handler file into the temporary directory
+              cp app/redirect.py package_redirect_temp/
+
+              # Navigate into the temporary directory, zip its contents, then move the zip to 'build'
+              cd package_redirect_temp
               zip -r ../build/redirect.zip .
               cd ..
-              rm -rf package # Clean up package directory
+
+              # Clean up the temporary directory
+              rm -rf package_redirect_temp
+
+    # Ensure the indentation for the next step, 'Set up Terraform', remains correct.
+    
 
           - name: Set up Terraform
             uses: hashicorp/setup-terraform@v2
