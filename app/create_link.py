@@ -3,7 +3,7 @@ import boto3
 import os
 import random
 import string
-from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Logger, Metrics # ADD Metrics here
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
@@ -15,10 +15,13 @@ resolver = APIGatewayRestResolver()
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['TABLE_NAME'])
 
+# INSTANTIATE THE METRICS OBJECT HERE, BEFORE THE HANDLER FUNCTION
+metrics = Metrics(service="url-shortener-create")
+
 
 @resolver.post("/create")  # Endpoint to create a short link
 @logger.inject_lambda_context  # Inject context for logging
-@logger.log_metrics  # Log metrics for monitoring
+@metrics.log_metrics # CHANGE THIS LINE: Use metrics.log_metrics
 def create_link_handler(event: dict, context: LambdaContext):
     """
     Handles the POST request to create a short link.

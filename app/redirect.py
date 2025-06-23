@@ -1,7 +1,7 @@
 import boto3
 import os
 import json
-from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Logger, Metrics # ADD Metrics here
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
@@ -13,10 +13,13 @@ resolver = APIGatewayRestResolver()
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['TABLE_NAME'])
 
+# INSTANTIATE THE METRICS OBJECT HERE, BEFORE THE HANDLER FUNCTION
+metrics = Metrics(service="url-shortener-redirect")
+
 
 @resolver.get("/{code}")
 @logger.inject_lambda_context # Keep this first for context injection
-@logger.log_metrics # Placed after inject_lambda_context
+@metrics.log_metrics # CHANGE THIS LINE: Use metrics.log_metrics
 def redirect_handler(event: dict, context: LambdaContext):
     """
     Handles the GET request to redirect from a short code to the original URL.
