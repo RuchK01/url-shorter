@@ -37,7 +37,7 @@
             run: |
               flake8 app/ # Run flake8 on the app directory
 
-                    - name: Package Lambda Functions
+          - name: Package Lambda Functions
             run: |
               # Create a 'build' directory at the root for the final zip files
               mkdir -p build
