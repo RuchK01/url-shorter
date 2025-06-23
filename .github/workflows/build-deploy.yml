@@ -32,10 +32,32 @@
               python -m pip install --upgrade pip
               pip install -r app/requirements.txt
               pip install flake8 # Install flake8 for linting
-
+      
           - name: Run Flake8 Lint Check
             run: |
               flake8 app/ # Run flake8 on the app directory
+              
+          - name: Package Lambda Functions
+            run: |
+              # Create a build directory for deployment packages
+              mkdir -p build
+
+              # Package create_link Lambda
+              pip install --target ./package create_link.py # Install create_link.py into package dir
+              cp app/create_link.py package/
+              cd package
+              zip -r ../build/create_link.zip .
+              cd ..
+              rm -rf package # Clean up package directory
+
+              # Package redirect Lambda
+              mkdir -p package # Recreate package directory for redirect
+              pip install --target ./package redirect.py # Install redirect.py into package dir
+              cp app/redirect.py package/
+              cd package
+              zip -r ../build/redirect.zip .
+              cd ..
+              rm -rf package # Clean up package directory
 
           - name: Set up Terraform
             uses: hashicorp/setup-terraform@v2
